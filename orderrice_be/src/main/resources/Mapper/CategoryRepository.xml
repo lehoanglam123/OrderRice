@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.bezkoder.spring.datajpa.repository.CategoryRepository">
+	<select id="getAllCategory"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT * FROM category WHERE create_date = date(now()) AND
+		active = 1;
+	</select>
+
+	<insert id="createCategory">
+		INSERT INTO category (food_name, create_date, price,
+		active) VALUES (#{foodName},date(now()),#{price}, 1);
+	</insert>
+
+	<select id="getCategory"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT*FROM category WHERE food_name = #{foodName} and
+		active =1;
+	</select>
+	<select id="getcateid"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT*FROM category WHERE id = #{id}
+	</select>
+
+	<select id="getCategoryById"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT*FROM category WHERE category.id = #{id} and active
+		=1;
+	</select>
+
+	<select id="getCategoryNotInId"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT*FROM category WHERE food_name = #{foodName} AND id
+		NOT IN (#{id});
+	</select>
+
+	<update id="updateCategoryById">
+		UPDATE category
+		SET food_name = #{foodName}, price =
+		#{price}
+		WHERE category.id = #{id}
+	</update>
+
+	<update id="updateAllCategory">
+		UPDATE category
+		set active = 0
+		WHERE create_date =
+		DATE(NOW());
+	</update>
+
+	<select id="selectAllCategory"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT * FROM category
+		WHERE active = 1 AND create_date =
+		DATE(NOW());
+	</select>
+
+	<delete id="deleteById">
+		DELETE FROM Category WHERE id = #{id}
+	</delete>
+
+	<delete id="deleteAllCategory">
+		DELETE FROM category WHERE active = 0 AND
+		category.create_date = DATE(NOW())-1;
+	</delete>
+
+	<select id="selectFor"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result">
+		SELECT*FROM category WHERE category.id IN
+		<foreach collection="categoryId" item="list" open="("
+			close=")" separator=",">
+			${list}
+		</foreach>
+	</select>
+
+	<update id="deleteFor">
+		UPDATE category set category.active = 0 WHERE category.id IN
+		<foreach collection="categoryId" item="listId" open="("
+			close=")" separator=",">
+			${listId}
+		</foreach>
+	</update>
+
+	<select id="SelectCategoryByFoodName"
+		resultType="com.bezkoder.spring.datajpa.model.Category"
+		resultMap="result" parameterType="java.util.List">
+		SELECT
+		*
+		FROM category
+		WHERE create_date = DATE(NOW()) AND category.food_name
+		IN
+		<foreach collection="listCategoryRequest" index="index"
+			item="item" open="(" separator=" , " close=") ">
+			#{item.foodName}
+		</foreach>
+	</select>
+
+	<select id="getCategoryLimitByDate"
+		resultType="com.bezkoder.spring.datajpa.model.CategoryLimit">
+		SELECT
+			c.id,
+			c.food_name,
+			c.price,
+			c.create_date
+		FROM category c
+			JOIN (
+			SELECT DATE(create_date) AS date
+			FROM category
+			WHERE DATE(create_date) != CURDATE()
+			GROUP BY DATE(create_date)
+			ORDER BY DATE(create_date) DESC
+			LIMIT 2
+			) d ON DATE(c.create_date) = d.date
+	</select>
+
+	<insert id="saveCategoryByFoodName"
+		parameterType="java.util.List">
+		INSERT INTO category (
+		food_name,
+		create_date,
+		price,
+		active)
+		VALUES
+		<foreach collection="listCategoryRequest" index="index"
+			item="item" separator=",">
+			(#{item.foodName},date(now()),#{item.price}, 1)
+		</foreach>
+	</insert>
+
+
+	<resultMap id="result" type="Category">
+		<result property="id" column="id" />
+		<result property="foodName" column="food_name" />
+		<result property="createDate" column="create_date" />
+		<result property="price" column="price" />
+		<result property="active" column="active" />
+	</resultMap>
+</mapper>

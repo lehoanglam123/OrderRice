@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bezkoder.spring.datajpa.repository.EmployeeRepository">
+	<select id="getAllEmployee" resultType="com.bezkoder.spring.datajpa.model.Employee" resultMap="result">
+	SELECT*FROM employee
+	</select>
+
+	<select id="getEmployeeNew" resultType="com.bezkoder.spring.datajpa.model.Employee" resultMap="result">
+	SELECT * FROM employee ORDER BY id DESC LIMIT 1
+	</select>
+
+	<insert id="createNewEmployee" parameterType="map">
+	INSERT INTO `employee` (`full_name`, `department`, `account`, `phone`, `password`, `id_permission`) VALUES (#{fullName},#{department}, #{account},#{phone},#{password}, #{idPermission});
+	</insert>
+
+	<select id="getEmployeeByAccount" resultType="com.bezkoder.spring.datajpa.model.Employee" resultMap="result">
+		SELECT*FROM employee WHERE 1 = 1
+		<if test="account != null">
+			and account=#{account}
+		</if>
+	</select>
+
+	<select id="getEmployeeByAccountAndPass" resultType="com.bezkoder.spring.datajpa.model.Employee" resultMap="result">
+	SELECT*FROM employee WHERE account=#{account}
+	</select>
+
+	<resultMap id="result" type="Employee">
+		<result property="id" column="id" />
+		<result property="fullName" column="full_name" />
+		<result property="department" column="department" />
+		<result property="phone" column="phone" />
+		<result property="account" column="account" />
+		<result property="password" column="password" />
+		<result property="idPermission" column="id_permission" />
+	</resultMap>
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "https://mybatis.org/dtd/mybatis-3-config.dtd">
+ 
+<configuration>
+ 
+    <typeAliases>
+        <typeAlias alias="Employee" type="com.bezkoder.spring.datajpa.model.Employee" />
+        <typeAlias alias="Category" type="com.bezkoder.spring.datajpa.model.Category" />
+        <typeAlias alias="BillManagementById" type="com.bezkoder.spring.datajpa.model.BillManagementById" />
+        <typeAlias alias="ListCategory" type="com.bezkoder.spring.datajpa.request.ListCategory" />
+        <typeAlias alias="BillManagement" type="com.bezkoder.spring.datajpa.model.BillManagement" />
+        <typeAlias alias="ListBillManagement" type="com.bezkoder.spring.datajpa.request.ListBillManagement" />
+        <typeAlias alias="ExportExcelBill" type="com.bezkoder.spring.datajpa.model.ExportExcelBill" />
+        <typeAlias alias="TotalPriceByAccount" type="com.bezkoder.spring.datajpa.model.TotalPriceByAccount" />
+         <typeAlias alias="ExcelPreview" type="com.bezkoder.spring.datajpa.model.ExcelPreview" />
+          <typeAlias alias="ListCategoryRequest" type="com.bezkoder.spring.datajpa.request.ListCategoryRequest" />     
+    </typeAliases>
+    <mappers>
+        <mapper resource="Mapper/EmployeeRepository.xml" />
+        <mapper resource="Mapper/CategoryRepository.xml" />
+        <mapper resource="Mapper/BillRepository.xml" />
+    </mappers>
+ 
+</configuration> 

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bezkoder.spring.datajpa.repository.BillRepository">
+
+	<select id="getAllBill" resultType="com.bezkoder.spring.datajpa.model.BillManagement" resultMap="result">
+	SELECT 
+		* FROM bill_management
+	</select>
+
+	<select id="getByIdBill" resultType="com.bezkoder.spring.datajpa.model.BillManagement" resultMap="result">
+	SELECT
+		 *
+		 FROM bill_management  WHERE id = {id}  and order_date = DATE(NOW())
+		
+	</select>
+
+	<select id="getByIdEmployee" resultType="com.bezkoder.spring.datajpa.model.BillManagementById" resultMap="resultBillManageById">	
+	SELECT
+			bill_management.id,
+		 id_employee,
+		 id_category,
+		 category.food_name,
+		 bill_management.total,
+		 bill_management.price,
+		 bill_management.order_date,
+		 bill_management.note
+		 FROM 
+			 bill_management 
+		 		JOIN category
+ 		 ON 
+ 		 	category.id = id_category 
+	 	 WHERE 
+	 	 	id_employee = #{idEmployee}  
+	 	 	AND order_date = DATE(NOW())
+	</select>
+
+	<select id="getBillManagementByEmployeeIdAndCategoryIdAndPrice" resultType="com.bezkoder.spring.datajpa.model.BillManagement" resultMap="result">
+		
+	SELECT 
+		* 
+	FROM bill_management 
+	WHERE id_employee = #{idEmployee} 
+		AND id_category= #{idCategory} 
+		AND price= #{price}
+		AND note = #{note}
+		AND order_date = DATE(NOW())
+		
+	</select>
+
+	<update id="updateQuantity">
+		UPDATE
+			bill_management
+		SET
+		total = #{total},
+		price = #{price},
+		note = #{note}
+		WHERE bill_management.id = #{id}
+	</update>
+
+	<insert id="createBill">
+		INSERT INTO
+			bill_management (
+			id_employee,
+			id_category,
+			total,
+			price,
+		    order_date,
+			note)
+		VALUES (
+			#{idEmployee},
+			#{idCategory},
+			#{total},
+			#{price},
+		    date(now()),
+			#{note});
+	</insert>
+
+	<select id="getBillManagementById" resultType="com.bezkoder.spring.datajpa.model.BillManagement" resultMap="result">
+		
+	SELECT 
+		* 
+	FROM bill_management 
+	WHERE id = #{id} 
+		
+		
+	</select>
+	<update id="updateBillManagementById">
+		
+		UPDATE 
+			bill_management 
+		SET  
+			price =#{price},
+		    total = #{total},
+		    note = #{note}
+			 
+		WHERE bill_management.id = #{id}
+		
+	</update>
+
+	<delete id="deleteListIdBillManagement">
+		DELETE
+			FROM bill_management
+		WHERE bill_management.id 
+			IN
+		<foreach collection="idBillManagement" item="listId" open="(" close=")" separator=",">
+					${listId}
+			</foreach>
+	</delete>
+
+	<select id="getListIdBillManagement" resultType="com.bezkoder.spring.datajpa.model.BillManagement" resultMap="result">
+		SELECT
+		 	*
+	 	FROM bill_management 
+		WHERE bill_management.id 
+		IN
+		<foreach collection="idBillManagement" item="listId" open="(" close=")" separator=",">${listId}</foreach>
+	</select>
+	
+	<!-- Xuat bill-->
+	<select id="getBillByFromDateAndToDate" resultType="com.bezkoder.spring.datajpa.model.ExportExcelBill" resultMap="resultExportExcelBill">
+	SELECT
+		bill_management.id,
+		employee.account,
+		category.food_name,
+		bill_management.total,
+		bill_management.price,
+		bill_management.note,
+		bill_management.order_date
+	FROM 
+		bill_management
+			JOIN employee
+				ON bill_management.id_employee = employee.id
+			JOIN category
+				ON bill_management.id_category = category.id
+	WHERE (bill_management.order_date BETWEEN #{fromDate} AND #{toDate})
+	ORDER BY employee.account, bill_management.order_date
+	</select>
+	
+	<select id="getSumTotalPriceByAccountByFromDateAndToDate" resultType="com.bezkoder.spring.datajpa.model.TotalPriceByAccount" resultMap="resultTotalPriceByAccount">
+	SELECT
+			employee.account,
+			SUM(bill_management.total)AS "total",
+			SUM(bill_management.price)AS "price"
+	FROM bill_management
+	JOIN employee 
+			ON bill_management.id_employee = employee.id
+	JOIN category
+			ON bill_management.id_category = category.id
+	WHERE (bill_management.order_date BETWEEN #{fromDate} AND #{toDate})
+	GROUP BY employee.id
+	</select>
+	
+	<resultMap id="resultTotalPriceByAccount" type="TotalPriceByAccount">
+		<result property="account" column="account" />
+		<result property="total" column="total" />
+		<result property="price" column="price" />
+	</resultMap>
+
+	<resultMap id="result" type="BillManagement">
+		<result property="id" column="id" />
+		<result property="idEmployee" column="id_employee" />
+		<result property="idCategory" column="id_category" />
+		<result property="foodName" column="food_name"/>
+		<result property="price" column="price" />
+		<result property="total" column="total" />
+		<result property="orderDate" column="order_date" />
+		<result property="note" column="note" />
+	</resultMap>
+
+	<resultMap id="resultBillManageById" type="BillManagementById">
+		<result property="id" column="id" />
+		<result property="idEmployee" column="id_employee" />
+		<result property="idCategory" column="id_category" />
+		<result property="foodName" column="food_name" />
+		<result property="total" column="total" />
+		<result property="price" column="price" />
+		<result property="orderDate" column="order_date" />
+		<result property="note" column="note" />
+	</resultMap>
+	
+	<resultMap id="resultExportExcelBill" type="ExportExcelBill">
+		<result property="id" column="id" />
+		<result property="account" column="account" />
+		<result property="foodName" column="food_name" />
+		<result property="total" column="total" />
+		<result property="price" column="price" />
+		<result property="note" column="note" />
+		<result property="orderDate" column="order_date" />
+	</resultMap>
+
+</mapper>
